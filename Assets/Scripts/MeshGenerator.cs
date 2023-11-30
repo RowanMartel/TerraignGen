@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 
 [RequireComponent(typeof(MeshFilter))]
 public class MeshGenerator : MonoBehaviour
@@ -14,7 +14,7 @@ public class MeshGenerator : MonoBehaviour
     [SerializeField] int planeWidth;
     [SerializeField] float heightMultiplier;
     [SerializeField] float inverseFrequency;
-    [SerializeField] float iterations;
+    [SerializeField] int iterations;
 
     void Start()
     {
@@ -59,6 +59,7 @@ public class MeshGenerator : MonoBehaviour
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
         mesh.RecalculateNormals();
+        transform.position = new Vector3(0, -(iterations * heightMultiplier) / 2, 0);
     }
 
     void AdjustVertexHeight()
@@ -72,16 +73,42 @@ public class MeshGenerator : MonoBehaviour
         }
     }
 
-    private void Update()
+    public void Process()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-            Process();
-    }
-
-    void Process()
-    {
+        ProcessUI();
         CreateShape();
         AdjustVertexHeight();
         UpdateMesh();
+    }
+
+    // UI methods and properties
+
+    [SerializeField] GameObject properties;
+    [SerializeField] GameObject collapseBtn;
+    [SerializeField] GameObject expandBtn;
+    [SerializeField] Slider meshSizeSlider;
+    [SerializeField] Slider heightMultiplierSlider;
+    [SerializeField] Slider inverseFrequencySlider;
+    [SerializeField] Slider iterationsSlider;
+
+    public void CollapseProperties()
+    {
+        properties.SetActive(false);
+        collapseBtn.SetActive(false);
+        expandBtn.SetActive(true);
+    }
+    public void ExpandProperties()
+    {
+        properties.SetActive(true);
+        collapseBtn.SetActive(true);
+        expandBtn.SetActive(false);
+    }
+
+    void ProcessUI()
+    {
+        planeWidth = (int)meshSizeSlider.value;
+        heightMultiplier = heightMultiplierSlider.value;
+        inverseFrequency = inverseFrequencySlider.value;
+        iterations = (int)iterationsSlider.value;
     }
 }
